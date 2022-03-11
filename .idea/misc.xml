@@ -6,10 +6,12 @@
         <entry key="app/src/main/res/drawable/ic_baseline_photo_24.xml" value="0.2665" />
         <entry key="app/src/main/res/drawable/ic_baseline_play_arrow.xml" value="0.2665" />
         <entry key="app/src/main/res/drawable/ic_cloud_backup.xml" value="0.2665" />
-        <entry key="app/src/main/res/layout/activity_cloud_backup.xml" value="0.3066123188405797" />
+        <entry key="app/src/main/res/drawable/layout_bg.xml" value="0.2665" />
+        <entry key="app/src/main/res/layout/activity_cloud_backup.xml" value="0.264" />
         <entry key="app/src/main/res/layout/activity_image_detail.xml" value="0.3066123188405797" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3066123188405797" />
         <entry key="app/src/main/res/layout/card_layout.xml" value="0.3066123188405797" />
+        <entry key="app/src/main/res/layout/cloud_backup_action_bar.xml" value="0.3066123188405797" />
         <entry key="app/src/main/res/layout/layout_for_image_viewing.xml" value="0.3066123188405797" />
         <entry key="app/src/main/res/layout/view_blue.xml" value="0.3066123188405797" />
         <entry key="app/src/main/res/layout/view_green.xml" value="0.3066123188405797" />
