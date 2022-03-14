@@ -29,7 +29,7 @@ public class CloudBackupActivity extends GoogleDriveActivity {
     CardView signInToDriveCv;
     ConstraintLayout driveConstraintLayout;
     ConstraintLayout driveLoginConstraintLayout;
-    TextView logOutTextView;
+    TextView logOutTextView, loggedInEmailTextView;
 
     //Intents and Variables
     Intent intent;
@@ -57,6 +57,7 @@ public class CloudBackupActivity extends GoogleDriveActivity {
         driveConstraintLayout = findViewById(R.id.constraintLayoutDrive);
         driveLoginConstraintLayout = findViewById(R.id.constraintLayoutDriveLogin);
         logOutTextView = findViewById(R.id.textViewLogOut);
+        loggedInEmailTextView = findViewById(R.id.textViewLoggedInEmail);
     }
 
     private void initViews() {
@@ -79,9 +80,6 @@ public class CloudBackupActivity extends GoogleDriveActivity {
             @Override
             public void onClick(View v) {
                 startGoogleDriveSignOut();
-                driveConstraintLayout.setVisibility(View.INVISIBLE);
-                driveLoginConstraintLayout.setVisibility(View.VISIBLE);
-
             }
         });
     }
@@ -91,6 +89,8 @@ public class CloudBackupActivity extends GoogleDriveActivity {
         repository = new GoogleDriveApiDataRepository(driveApi);
         driveService = driveApi;
         signInA = signInAccount;
+        loggedInEmailTextView.setText(signInAccount.getEmail());
+
         Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
         driveConstraintLayout.setVisibility(View.VISIBLE);
         driveLoginConstraintLayout.setVisibility(View.INVISIBLE);
@@ -102,10 +102,10 @@ public class CloudBackupActivity extends GoogleDriveActivity {
 
     }
 
-    /*@Override
+    @Override
     protected void onGoogleDriveSignedOutSuccess(GoogleSignInAccount signOutAccount) {
         Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show();
         driveConstraintLayout.setVisibility(View.INVISIBLE);
         driveLoginConstraintLayout.setVisibility(View.VISIBLE);
-    }*/
+    }
 }

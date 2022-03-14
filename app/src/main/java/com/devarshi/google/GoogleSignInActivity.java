@@ -23,7 +23,7 @@ public abstract class GoogleSignInActivity extends AppActivity {
 
     protected abstract void onGoogleSignedInFailed(final ApiException exception);
 
-//    protected abstract void onGoogleSignedOutSuccess(GoogleSignInAccount account);
+    protected abstract void onGoogleSignedOutSuccess(GoogleSignInAccount googleSignInAccount);
 
     protected void startGoogleSignIn() {
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, getGoogleSignInOptions());
@@ -35,7 +35,6 @@ public abstract class GoogleSignInActivity extends AppActivity {
         GoogleSignInClient googleSignOutClient = GoogleSignIn.getClient(this, getGoogleSignInOptions());
         Intent signOutIntent = googleSignOutClient.getSignInIntent();
         startActivityForResult(signOutIntent,GOOGLE_SIGN_OUT_REQUEST);
-        googleSignOutClient.signOut();
     }
 
     @Override
@@ -45,10 +44,10 @@ public abstract class GoogleSignInActivity extends AppActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
         }
-        /*if (requestCode == GOOGLE_SIGN_OUT_REQUEST){
+        if (requestCode == GOOGLE_SIGN_OUT_REQUEST){
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignOutResult(task);
-        }*/
+        }
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
@@ -60,12 +59,13 @@ public abstract class GoogleSignInActivity extends AppActivity {
         }
     }
 
-    /*private void handleSignOutResult(Task<GoogleSignInAccount> completedTask){
+    private void handleSignOutResult(Task<GoogleSignInAccount> completedTask){
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             onGoogleSignedOutSuccess(account);
-        } catch (ApiException e) {
-            e.printStackTrace();
         }
-    }*/
+        catch (ApiException e){
+            onGoogleSignedInFailed(e);
+        }
+    }
 }
