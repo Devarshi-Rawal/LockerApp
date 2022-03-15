@@ -39,7 +39,6 @@ public class HiddenItemsAdapter extends RecyclerView.Adapter<HiddenItemsAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, @SuppressLint("RecyclerView") int position) {
-
         // on below line we are getting th file from the
         // path which we have stored in our list.
         File imgFile = new File(imagePathArrayList.get(position));

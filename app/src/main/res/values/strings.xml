@@ -3,4 +3,6 @@
     <string name="red">RED</string>
     <string name="blue">BLUE</string>
     <string name="green">GREEN</string>
+    <string name="message_drive_client_is_ready">Google Drive client is ready</string>
+    <string name="message_google_sign_in_failed">Google Sign In failed</string>
 </resources>

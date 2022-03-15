@@ -11,6 +11,7 @@
         android:id="@+id/constraintLayoutDriveLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -44,10 +45,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Sign in to Google Drive"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
                     android:layout_marginEnd="10dp"
+                    android:text="Sign in to Google Drive"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/imageViewDrive"
@@ -155,8 +156,8 @@
                 android:id="@+id/textViewLogOut"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Log out"
                 android:layout_marginLeft="30dp"
+                android:text="Log out"
                 android:textColor="#2196F3"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -238,7 +239,7 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/backupNowConstraintLayout"
+            android:id="@+id/constraintLayoutBackupNow"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:background="@color/cardview_dark_background"
@@ -271,7 +272,7 @@
             android:textSize="13dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/backupNowConstraintLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayoutBackupNow" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
