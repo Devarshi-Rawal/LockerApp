@@ -13,7 +13,7 @@ import com.devarshi.app.App;
 class DatabaseOpenHelper extends SQLiteOpenHelper {
 
     static SQLiteDatabase getAppDatabase() {
-        final DatabaseOpenHelper helper = new DatabaseOpenHelper(App.getInstance());
+        DatabaseOpenHelper helper = new DatabaseOpenHelper(App.getInstance());
         return helper.getWritableDatabase();
     }
 

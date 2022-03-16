@@ -1,6 +1,7 @@
 package com.devarshi.data;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -17,7 +18,6 @@ public class InfoRepository {
         ContentValues values = new ContentValues();
         values.put(DBConstants.INFO_FIELD_TEXT, info);
         db.insert(DBConstants.TABLE_INFO, null, values);
-        db.close();
     }
 
     @Nullable
