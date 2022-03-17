@@ -5,6 +5,7 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -21,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -104,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void viewBackupActivity() {
 
-        Intent intent = new Intent(this,CloudBackupActivity.class);
-        intent.putExtra("imagePaths",imagePaths);
+        Intent intent = new Intent(this, CloudBackupActivity.class);
+        intent.putExtra("imagePaths", imagePaths);
         startActivity(intent);
     }
 
@@ -131,6 +133,19 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewHi.setLayoutManager(manager);
         recyclerViewHi.setAdapter(imageRVAdapter);
 
+    }
+
+    void requestDeletePermission(List<Uri> uriList) {
+        PendingIntent pendingIntent = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            pendingIntent = MediaStore.createDeleteRequest(this.getContentResolver(), uriList);
+        }
+        try {
+            this.startIntentSenderForResult(pendingIntent.getIntentSender(), 10, null, 0, 0,
+                    0, null);
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static String getPath(Context context, Uri uri) {
@@ -288,11 +303,13 @@ public class MainActivity extends AppCompatActivity {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "onActivityResult: Exception: " + e);
         }
 
     }
 
+
+    //Do not delete comments of this method.
     private void moveFile(Uri uri, String outputPath, Context context) {
 
         InputStream in = null;
@@ -316,13 +333,22 @@ public class MainActivity extends AppCompatActivity {
             out.close();
             out = null;
             // delete the original file
+            /*String filePath = getPath(context, uri);
+            Log.d(TAG, "moveFile: filepath: " + new File(filePath).getParent());*/
+
+            /*if (filePath != null) {
+                uriId = getContentUriId(uri);
+            }*/
             String filePath = getPath(context, uri);
-            Log.d(TAG, "moveFile: filepath: " + new File(filePath).getParent());
+            /*if (filePath != null) {
+                Log.d(TAG, "moveFile: FilePath: " + new File(filePath).getParent());
+            }*/
 
             if (filePath != null) {
                 uriId = getContentUriId(Uri.parse(filePath));
             }
 
+            Log.d(TAG, "moveFile: UriId: " + uriId);
             try {
                 if (filePath != null) {
                     deleteAPI28(uriId, context);
@@ -353,10 +379,7 @@ public class MainActivity extends AppCompatActivity {
 
         List<Uri> uriList = new ArrayList<>();
         Collections.addAll(uriList, imageUri);
-        PendingIntent pendingIntent = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            pendingIntent = MediaStore.createDeleteRequest(contentResolver, uriList);
-        }
+        PendingIntent pendingIntent = MediaStore.createDeleteRequest(contentResolver, uriList);
         this.startIntentSenderForResult(pendingIntent.getIntentSender(),
                 DELETE_REQUEST_CODE, null, 0,
                 0, 0, null);

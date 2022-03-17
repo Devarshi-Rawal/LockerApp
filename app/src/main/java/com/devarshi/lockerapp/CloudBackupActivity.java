@@ -141,8 +141,39 @@ public class CloudBackupActivity extends GoogleDriveActivity {
                 showMessage(R.string.message_google_sign_in_failed);
                 return;
             }
+            
+            repository.queryFiles()
+                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
+                        @Override
+                        public void onSuccess(FileList fileList) {
+                            
+                            for (File file : fileList.getFiles()){
+                                
+                                repository.uploadFile(db, String.valueOf(new java.io.File(String.valueOf(file))))
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void unused) {
+                                                Log.d(TAG, "onSuccess: UploadedFile: " + file.getName());
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e(TAG, "onFailure: ExceptionCaughtUploading: " + e.getMessage());
+                                            }
+                                        });
+                            }
+                            showMessage("Upload Successful");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            
+                        }
+                    });
 
-            repository.uploadFile(db, GOOGLE_DRIVE_DB_LOCATION)
+            /*repository.uploadFile(db, GOOGLE_DRIVE_DB_LOCATION)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
@@ -152,6 +183,26 @@ public class CloudBackupActivity extends GoogleDriveActivity {
                                         @Override
                                         public void onSuccess(FileList fileList) {
 
+                                            for (File file : fileList.getFiles()){
+
+                                                repository.uploadFile(db,file.getName())
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void unused) {
+                                                                showMessage("Upload Success");
+                                                                String reInfo = file.getName();
+                                                                String fName = reInfo.substring(reInfo.lastIndexOf("/") + 1);
+
+                                                                Log.d(TAG, "onSuccess: Uploaded: " + file.getName());
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+
+                                                            }
+                                                        });
+                                            }
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {
@@ -167,84 +218,11 @@ public class CloudBackupActivity extends GoogleDriveActivity {
                         public void onFailure(@NonNull Exception e) {
 
                         }
-                    });
+                    });*/
 
         }
         catch (Exception e){
             e.getMessage();
         }
-
-            /*repository.queryFiles()
-                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
-                        @Override
-                        public void onSuccess(FileList fileList) {
-
-                            for (File file : fileList.getFiles()) {
-
-                                Log.d(TAG, "onSuccess: file: " + file);
-
-                                repository.uploadFile(db, String.valueOf(file))
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                showMessage("Upload Success");
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-
-                                                showMessage("Error Uploading Backup");
-                                                Log.e(TAG, "onFailure: Upload Exception: " + e.getMessage());
-                                            }
-                                        });
-                            }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-
-                        }
-                    });
-        } catch (Exception e) {
-            showMessage(e.getMessage());
-            Log.e(TAG, "backupNow: exception: " + e.getMessage());
-        }*/
-
-        /*repository.queryFiles()
-                .addOnSuccessListener(new OnSuccessListener<FileList>() {
-                    @Override
-                    public void onSuccess(FileList fileList) {
-
-                        for (File file : fileList.getFiles()){
-                            InfoRepos repos = new InfoRepos();
-                            repos.writeInfo(String.valueOf(file));
-
-                            repository.uploadFile(db, String.valueOf(file))
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            showMessage("Upload success");
-                                            Log.d(TAG, "actionOnClickOfUploadToDrive: Uploaded: " + file);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.e("Not Uploaded: ", "error upload file " + e.getMessage());
-                                            showMessage("Error upload");
-                                        }
-                                    });
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("Not Uploaded: ", "error upload file " + e.getMessage());
-                        showMessage("Error upload");
-                    }
-                });*/
     }
 }
