@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     //PERMISSION_CODES & Static Variables
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public String filename;
     public ArrayList<String> imagePaths;
     Uri uriId;
+    int pos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, CloudBackupActivity.class);
         intent.putExtra("imagePaths", imagePaths);
+        intent.putExtra("pos",pos);
         startActivity(intent);
     }
 

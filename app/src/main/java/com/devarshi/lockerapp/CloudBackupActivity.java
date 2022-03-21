@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,10 +18,12 @@ import com.devarshi.data.DBConstants;
 import com.devarshi.data.InfoRepository;
 import com.devarshi.google.GoogleDriveActivity;
 import com.devarshi.google.GoogleDriveApiDataRepository;
+import com.devarshi.model.ImageModel;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.button.MaterialButton;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -36,8 +40,10 @@ public class CloudBackupActivity extends GoogleDriveActivity {
     //Layouts, Views, etc.
     ImageView imageViewExit;
     CardView signInToDriveCv;
-    ConstraintLayout driveConstraintLayout, driveLoginConstraintLayout, backupNowConstraintLayout;
-    TextView logOutTextView, loggedInEmailTextView;
+    LinearLayout containerLinearLayout;
+    ConstraintLayout driveLoginLinearLayout;
+    TextView logOutButton, loggedInEmailTextView;
+    MaterialButton restoreButton,backupNowButton;
 
     //Intents and Variables
     Intent intent;
@@ -45,6 +51,13 @@ public class CloudBackupActivity extends GoogleDriveActivity {
     public GoogleDriveApiDataRepository repository;
     GoogleSignInAccount signInA;
     Drive driveService;
+
+    ArrayList<ImageModel> writeToDbList;
+
+    ImageModel imageModel = new ImageModel();
+    private String fName;
+
+    boolean isOnSuccessTrue = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,17 +76,20 @@ public class CloudBackupActivity extends GoogleDriveActivity {
     private void findViews() {
         imageViewExit = findViewById(R.id.exitImageView);
         signInToDriveCv = findViewById(R.id.cardViewSignInToDrive);
-        driveConstraintLayout = findViewById(R.id.constraintLayoutDrive);
-        backupNowConstraintLayout = findViewById(R.id.constraintLayoutBackupNow);
-        driveLoginConstraintLayout = findViewById(R.id.constraintLayoutDriveLogin);
-        logOutTextView = findViewById(R.id.textViewLogOut);
+        containerLinearLayout = findViewById(R.id.linearLayoutContainer);
+        backupNowButton = findViewById(R.id.buttonBackUpNow);
+        restoreButton = findViewById(R.id.buttonRestore);
+        driveLoginLinearLayout = findViewById(R.id.constraintLayoutDriveLogin);
+        logOutButton = findViewById(R.id.buttonLogOut);
         loggedInEmailTextView = findViewById(R.id.textViewLoggedInEmail);
     }
 
     private void initViews() {
 
-        driveConstraintLayout.setVisibility(View.INVISIBLE);
-        driveLoginConstraintLayout.setVisibility(View.VISIBLE);
+        writeToDbList = new ArrayList<>();
+
+        containerLinearLayout.setVisibility(View.INVISIBLE);
+        driveLoginLinearLayout.setVisibility(View.VISIBLE);
         imageViewExit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,16 +103,23 @@ public class CloudBackupActivity extends GoogleDriveActivity {
             }
         });
 
-        logOutTextView.setOnClickListener(new View.OnClickListener() {
+        logOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startGoogleDriveSignOut();
             }
         });
-        backupNowConstraintLayout.setOnClickListener(new View.OnClickListener() {
+        backupNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 backupNow();
+            }
+        });
+
+        restoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restore();
             }
         });
     }
@@ -109,8 +132,8 @@ public class CloudBackupActivity extends GoogleDriveActivity {
         loggedInEmailTextView.setText(signInAccount.getEmail());
 
         Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
-        driveConstraintLayout.setVisibility(View.VISIBLE);
-        driveLoginConstraintLayout.setVisibility(View.INVISIBLE);
+        containerLinearLayout.setVisibility(View.VISIBLE);
+        driveLoginLinearLayout.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -122,107 +145,78 @@ public class CloudBackupActivity extends GoogleDriveActivity {
     @Override
     protected void onGoogleDriveSignedOutSuccess(GoogleSignInAccount signOutAccount) {
         Toast.makeText(this, "Signed out successfully", Toast.LENGTH_SHORT).show();
-        driveConstraintLayout.setVisibility(View.INVISIBLE);
-        driveLoginConstraintLayout.setVisibility(View.VISIBLE);
+        containerLinearLayout.setVisibility(View.INVISIBLE);
+        driveLoginLinearLayout.setVisibility(View.VISIBLE);
     }
 
     private void backupNow() {
-        try {
-            InfoRepository repos = new InfoRepository();
+        InfoRepository repos = new InfoRepository();
 
-            for (String s : itemsToBeBackedUpList) {
-                repos.writeInfo(s);
-                Log.d(TAG, "backupNow: repos: " + repos.getInfo());
-            }
+        java.io.File db = new java.io.File(DBConstants.DB_LOCATION);
+        imageModel.setDb_file(db);
 
-            java.io.File db = new java.io.File(DBConstants.DB_LOCATION);
+        for (String s : itemsToBeBackedUpList) {
+            repos.writeInfo(s);
+            imageModel.setFile(new java.io.File(s));
+            writeToDbList.add(imageModel);
+            Log.d(TAG, "backupNow: repos: " + repos.getInfo());
+            Log.d(TAG, "backupNow: The writeToDbList element is: " + imageModel.getFile());
 
             if (repository == null) {
                 showMessage(R.string.message_google_sign_in_failed);
                 return;
             }
-            
-            repository.queryFiles()
-                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
-                        @Override
-                        public void onSuccess(FileList fileList) {
-                            
-                            for (File file : fileList.getFiles()){
-                                
-                                repository.uploadFile(db, String.valueOf(new java.io.File(String.valueOf(file))))
-                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                            @Override
-                                            public void onSuccess(Void unused) {
-                                                Log.d(TAG, "onSuccess: UploadedFile: " + file.getName());
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "onFailure: ExceptionCaughtUploading: " + e.getMessage());
-                                            }
-                                        });
-                            }
-                            showMessage("Upload Successful");
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            
-                        }
-                    });
 
-            /*repository.uploadFile(db, GOOGLE_DRIVE_DB_LOCATION)
+            repository.uploadFile(imageModel.getDb_file(), String.valueOf(imageModel.getFile()))
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
-
-                            repository.queryFiles()
-                                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
-                                        @Override
-                                        public void onSuccess(FileList fileList) {
-
-                                            for (File file : fileList.getFiles()){
-
-                                                repository.uploadFile(db,file.getName())
-                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                            @Override
-                                                            public void onSuccess(Void unused) {
-                                                                showMessage("Upload Success");
-                                                                String reInfo = file.getName();
-                                                                String fName = reInfo.substring(reInfo.lastIndexOf("/") + 1);
-
-                                                                Log.d(TAG, "onSuccess: Uploaded: " + file.getName());
-                                                            }
-                                                        })
-                                                        .addOnFailureListener(new OnFailureListener() {
-                                                            @Override
-                                                            public void onFailure(@NonNull Exception e) {
-
-                                                            }
-                                                        });
-                                            }
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
+                            isOnSuccessTrue = true;
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-
+                            isOnSuccessTrue = false;
                         }
-                    });*/
+                    });
+        }
 
+        if (isOnSuccessTrue){
+            showMessage("Upload Successful");
         }
-        catch (Exception e){
-            e.getMessage();
+        else {
+            showMessage("Upload Unsuccessful");
         }
+    }
+
+    private void restore(){
+
+        if (repository == null) {
+            showMessage(R.string.message_google_sign_in_failed);
+            return;
+        }
+
+        repository.queryFiles()
+                .addOnSuccessListener(new OnSuccessListener<FileList>() {
+                    @Override
+                    public void onSuccess(FileList fileList) {
+
+                        for (File file : fileList.getFiles()){
+                            String reInfo = file.getName();
+                            fName = reInfo.substring(reInfo.lastIndexOf("/") + 1);
+
+                            Log.d(TAG, "onSuccess: FileName: " + fName);
+                            Log.d(TAG, "onSuccess: FileIds: " + file.getId());
+                        }
+                        showMessage("Restore Successful");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        showMessage("Restore Unsuccessful");
+                    }
+                });
     }
 }

@@ -5,4 +5,10 @@
     <string name="green">GREEN</string>
     <string name="message_drive_client_is_ready">Google Drive client is ready</string>
     <string name="message_google_sign_in_failed">Google Sign In failed</string>
+    <string name="restore">Restore</string>
+    <string name="backup_now">Backup Now</string>
+    <string name="log_out">Log out</string>
+    <string name="cloud_backup">Cloud Backup</string>
+    <string name="sync_only_over_wi_fi">Sync only over Wi-Fi</string>
+    <string name="automatic_backup">Automatic Backup</string>
 </resources>
